@@ -7,7 +7,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("mute")
         .setDescription("Mute a member")
-        .setContexts(InteractionContextType.Guild)
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption((option) => 
             option.setName("user").setDescription("The member to mute").setRequired(true)

@@ -5,7 +5,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("roleinfo")
         .setDescription("Get info on a role")
-        .setContexts(InteractionContextType.Guild)
         .addRoleOption((option) => 
             option.setName("role").setDescription("Role to get info for").setRequired(true)
         ),

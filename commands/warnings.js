@@ -7,7 +7,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("warnings")
         .setDescription("See the warnings for a member")
-        .setContexts(InteractionContextType.Guild)
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption((option) => 
             option.setName("user").setDescription("Member to see warnings for").setRequired(false)

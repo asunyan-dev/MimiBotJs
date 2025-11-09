@@ -5,7 +5,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("userinfo")
         .setDescription("Get info on a server member")
-        .setContexts(InteractionContextType.Guild)
         .addUserOption((option) => 
             option.setName("user").setDescription("User to check info for").setRequired(true)
         ),

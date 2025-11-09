@@ -4,8 +4,7 @@ const { SlashCommandBuilder, InteractionContextType, EmbedBuilder } = require('d
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("serverinfo")
-        .setDescription("Get info on the current server")
-        .setContexts(InteractionContextType.Guild),
+        .setDescription("Get info on the current server"),
 
 
     async execute(interaction) {

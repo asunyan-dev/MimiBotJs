@@ -6,8 +6,7 @@ const { getSuggest } = require('../modules/suggestions');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("suggest")
-        .setDescription("Make a new suggestion for the server")
-        .setContexts(InteractionContextType.Guild),
+        .setDescription("Make a new suggestion for the server"),
 
     async execute(interaction) {
         if(!interaction.guild) return;

@@ -7,7 +7,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("custom-role")
         .setDescription("Custom role commands")
-        .setContexts(InteractionContextType.Guild)
         .addSubcommand((sub) => 
             sub
                 .setName("make")

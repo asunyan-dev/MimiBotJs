@@ -18,7 +18,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("manage")
         .setDescription("Manage features of the bot")
-        .setContexts(InteractionContextType.Guild)
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommandGroup((group) => 
             group.setName("custom-role").setDescription("Manage custom roles")

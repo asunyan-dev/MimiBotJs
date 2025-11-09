@@ -5,7 +5,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("unban")
         .setDescription("Unban a user by ID")
-        .setContexts(InteractionContextType.Guild)
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
         .addStringOption((option) => 
             option.setName("id").setDescription("ID of the user").setRequired(true)
