@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
-const { NekoClient } = require('nekos.life');
+const NekoClient = require('nekos.life');
 
 
 module.exports = {

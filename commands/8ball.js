@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 
-const { NekoClient } = require('nekos.life');
+const NekoClient = require("nekos.life");
 
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const neko = new NekoClient();
+        const neko = new NekoClient()
 
         const question = interaction.options.getString("question", true);
 
