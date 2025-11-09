@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("weather")
         .setDescription("Get the current weather for a city")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addStringOption((option) => 
             option.setName("location").setDescription("Location. Format: 'City, Country/State'").setRequired(true)
         ),

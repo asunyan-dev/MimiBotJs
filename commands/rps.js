@@ -1,11 +1,12 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType, MessageFlags, InteractionContextType } = require('discord.js');
 
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("rps")
-        .setDescription("Play Rock Paper Scissors against the bot!"),
+        .setDescription("Play Rock Paper Scissors against the bot!")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
 
     async execute(interaction) {

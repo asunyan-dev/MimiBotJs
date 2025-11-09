@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 const NekoClient = require('nekos.life');
 
 
@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("interact")
         .setDescription("Interact with others")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addSubcommand((sub) => 
             sub
                 .setName("cuddle")

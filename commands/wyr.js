@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("wyr")
-        .setDescription("Get a would you rather question"),
+        .setDescription("Get a would you rather question")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
 
     async execute(interaction) {

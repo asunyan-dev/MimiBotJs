@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("coffee")
-        .setDescription("Get a random coffee pic"),
+        .setDescription("Get a random coffee pic")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
     async execute(interaction) {
 

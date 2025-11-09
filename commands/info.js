@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, InteractionContextType } = require('discord.js');
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("info")
-        .setDescription("Get info on the bot"),
+        .setDescription("Get info on the bot")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
 
     async execute(interaction) {

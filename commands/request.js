@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, ModalBuilder, ComponentType, TextInputStyle } = require('discord.js');
+const { SlashCommandBuilder, ModalBuilder, ComponentType, TextInputStyle, InteractionContextType } = require('discord.js');
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("request")
-        .setDescription("Request a feature or command to the bot owner."),
+        .setDescription("Request a feature or command to the bot owner.")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
     async execute(interaction) {
 

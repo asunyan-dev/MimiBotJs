@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 
 const languages = [
     { "name": "English", "code": "en" },
@@ -27,6 +27,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("translate")
         .setDescription("Translate your text to another language")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addStringOption((option) => 
             option.setName("text").setDescription("The text to translate").setRequired(true)
         )

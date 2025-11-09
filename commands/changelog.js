@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ModalBuilder, ComponentType, TextInputStyle, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ModalBuilder, ComponentType, TextInputStyle, MessageFlags, InteractionContextType } = require('discord.js');
 const config = require("../config.json");
 const { getChange } = require('../modules/botLogs');
 
@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("changelog")
         .setDescription("Get/Add changelog for the bot")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addSubcommand((sub) => 
             sub
                 .setName("get")

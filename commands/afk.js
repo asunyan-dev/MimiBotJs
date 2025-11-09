@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, InteractionContextType } = require('discord.js');
 
 const { setAfk } = require('../modules/afk');
 
@@ -7,6 +7,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("afk")
         .setDescription("Set your AFK status")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addStringOption((option) => 
             option
                 .setName("message")

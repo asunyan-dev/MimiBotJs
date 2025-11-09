@@ -1,10 +1,11 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("action")
         .setDescription("Action commands")
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addSubcommand((sub) => 
             sub
                 .setName("cry")
