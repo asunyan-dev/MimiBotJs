@@ -1,0 +1,31 @@
+# MimiBot - Commands
+
+- `/8ball` - Ask the magic 8 ball a question!
+- `/action` - Action commands, such as wave, smile or blush.
+- `/afk` - Set your AFK status.
+- `/anime` - Get information on an anime.
+- `/ban` - Ban a member (Requires "Ban Members" permission).
+- `/changelog` - Get the info on the latest bot version.
+- `/character` - Get information on an anime character.
+- `/coffee` - Get a random coffee picture.
+- `/coinflip` - Choose between Heads or Tails and flip a coin.
+- `/custom-role` - Make, edit or remove your custom role. (if enabled in the server.)
+- `/fact` - Get a random fact.
+- `/interact` - Interact with others. Example: kiss, hug, cuddle, ...
+- `/joke` - Get a random joke.
+- `/kick` - Kick a member (Requires "Kick Members" permission).
+- `/manage` - All management commands, for example for logs or custom roles (requires admin perms).
+- `/mute` - Mute a member (require moderate members permission).
+- `/request` - Request a feature or command to the bot owner.
+- `/roleinfo` - Get info on a role.
+- `/rps` - Play rock paper scissors against the bot.
+- `/serverinfo` - Get info on the current server.
+- `/suggest` - Make a new suggestion (if feature enabled).
+- `/translate` - Translate provided text to another language.
+- `/unban` - Unban a user (require ban members permission).
+- `/unmute` - Unmute a member (require moderate members permission).
+- `/userinfo` - Get info on a server member.
+- `/warn` - Warn a user (if feature enabled).
+- `/warnings` - Get list of warnings for a user (if feature enabled).
+- `/weather` - Get current weather for a city.
+- `/wyr` - Get a "Would you rather" question.
