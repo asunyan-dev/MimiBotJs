@@ -11,6 +11,7 @@
 - `/coinflip` - Choose between Heads or Tails and flip a coin.
 - `/custom-role` - Make, edit or remove your custom role. (if enabled in the server.)
 - `/fact` - Get a random fact.
+- `/info` - Get info about the bot.
 - `/interact` - Interact with others. Example: kiss, hug, cuddle, ...
 - `/joke` - Get a random joke.
 - `/kick` - Kick a member (Requires "Kick Members" permission).
