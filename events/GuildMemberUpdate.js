@@ -32,7 +32,7 @@ module.exports = {
                 .setTitle("Roles added")
                 .setThumbnail(newMember.displayAvatarURL({size: 512}))
                 .setColor(0xe410d3)
-                .setDescription(`<${newMember.id}>\n\n- ${addedRoles.map(id => `<@&${id}>`).join("\n- ")}`)
+                .setDescription(`<@${newMember.id}>\n\n- ${addedRoles.map(id => `<@&${id}>`).join("\n- ")}`)
                 .setFooter({text: `User ID: ${newMember.id}`})
                 .setTimestamp();
 

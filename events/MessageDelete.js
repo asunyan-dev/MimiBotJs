@@ -41,7 +41,7 @@ module.exports = {
         let description = [];
 
 
-        if(message.content) desctiption.push(`**Content:**\n${message.content.substring(0, 400)}`);
+        if(message.content) description.push(`**Content:**\n${message.content.substring(0, 400)}`);
         if(message.stickers.size > 0) {
             description.push(`**Stickers:**\n${message.stickers.map(sticker => sticker.name).join("\n")}`);
         };
