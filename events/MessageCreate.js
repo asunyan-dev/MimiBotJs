@@ -34,13 +34,13 @@ module.exports = {
             if(!fetched) return;
 
 
-            const customEmojiRegex = /<a?;\w+:\d+>/g;
+            const customEmojiRegex = /<a?:\w+:\d+>/g;
 
             const found = fetched.content.match(customEmojiRegex);
 
             if(found) {
                 found.forEach(e => {
-                    const parsed = e.match(/<(a?):(\w+):(\d)>/);
+                    const parsed = e.match(/<(a?):(\w+):(\d+)>/);
                     const animated = parsed[1] === "a";
                     const name = parsed[2];
                     const id = parsed[3];

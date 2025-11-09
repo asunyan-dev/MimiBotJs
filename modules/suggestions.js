@@ -9,6 +9,7 @@ if(!fs.existsSync(file)) {
 
 function load() {
     let data = JSON.parse(fs.readFileSync(file, "utf8"));
+    return data;
 };
 
 function save(data) {
