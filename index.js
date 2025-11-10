@@ -1,4 +1,4 @@
-const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, Events, ModalBuilder, ComponentType, TextInputStyle, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('./config.json');
@@ -50,6 +50,85 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args, client));
     };
 };
+
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if(!interaction.isButton()) return;
+
+    if(interaction.customId.startsWith("mail_")) {
+        const userId = interaction.customId.replace("mail_", "");
+
+        const message = interaction.message;
+        const components = message.components.map(row => {
+            const actionRow = ActionRowBuilder.from(row);
+            actionRow.components = actionRow.components.map(button => {
+                if(button.data.custom_id === interaction.customId) {
+                    return ButtonBuilder.from(button).setDisabled(true);
+                };
+                return button;
+            });
+            return actionRow;
+        });
+
+        await interaction.update({components: components});
+
+        const modal = new ModalBuilder()
+            .setCustomId(`mail_reply_${userId}`)
+            .setTitle("New reply")
+            .addLabelComponents(
+                {
+                    type: ComponentType.Label,
+                    label: "Your reply",
+                    component: {
+                        type: ComponentType.TextInput,
+                        custom_id: "message",
+                        style: TextInputStyle.Paragraph,
+                        placeholder: "Type your reply here...",
+                        required: true
+                    }
+                }
+            ).toJSON();
+
+        await interaction.showModal(modal);
+    };
+
+    if(interaction.customId.startsWith("reply_")) {
+        const userId = interaction.customId.replace("reply_", "");
+
+        const message = interaction.message;
+        const components = message.components.map(row => {
+            const actionRow = ActionRowBuilder.from(row);
+            actionRow.components = actionRow.components.map(button => {
+                if(button.data.custom_id === interaction.customId) {
+                    return ButtonBuilder.from(button).setDisabled(true);
+                };
+                return button;
+            });
+            return actionRow;
+        });
+
+        await interaction.update({components: components});
+
+        const modal = new ModalBuilder()
+            .setCustomId("modmail")
+            .setTitle("New Message to Staff")
+            .addLabelComponents(
+                {
+                    type: ComponentType.Label,
+                    label: "Your message",
+                    component: {
+                        type: ComponentType.TextInput,
+                        custom_id: "message",
+                        style: TextInputStyle.Paragraph,
+                        placeholder: "Type your message here...",
+                        required: true
+                    }
+                }
+            ).toJSON();
+
+        await interaction.showModal(modal);
+    }
+})
 
 
 client.login(config.token);
