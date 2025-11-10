@@ -1,5 +1,5 @@
 # MimiBot — Terms of Service
-**Last updated:** November 7, 2025  
+**Last updated:** November 10, 2025  
 
 Hello! 👋 Thanks for using **MimiBot** — a fun and friendly Discord bot created by **asunyan-dev**.  
 By inviting or using MimiBot, you agree to these Terms of Service (“Terms”). Please read them carefully!
@@ -42,12 +42,6 @@ I may modify or shut down features at any time.
 ## 5. Liability
 I’m not responsible for any damages, losses, or issues caused by using MimiBot.  
 Use it at your own discretion and make sure it fits your community’s rules.
-
----
-
-## 6. Changes
-These Terms might be updated occasionally. When that happens, the updated date will change above.  
-If you keep using MimiBot after updates, that means you accept the new Terms.
 
 ---
 
