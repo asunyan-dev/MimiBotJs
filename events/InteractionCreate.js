@@ -157,7 +157,14 @@ module.exports = {
 
                 if(!owner) return interaction.reply({content: "❌ There was an error, please try again later.", flags: MessageFlags.Ephemeral});
 
-                await owner.send(`New request from ${name}:\n\n${text}`);
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`request_${interaction.user.id}`)
+                        .setLabel("Reply")
+                        .setStyle(ButtonStyle.Primary)
+                ).toJSON();
+
+                await owner.send({content: `New request from ${name} (username: ${interaction.user.username}):\n\n${text}`, components: [row]});
 
                 return interaction.reply({content: "✅ Request sent.", flags: MessageFlags.Ephemeral});
             };
