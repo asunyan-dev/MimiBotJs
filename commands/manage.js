@@ -133,27 +133,6 @@ module.exports = {
             .addSubcommand((sub) => 
                 sub.setName("get").setDescription("Get current config for suggestions.")
             )
-        )
-        .addSubcommandGroup((group) => 
-            group.setName("modmail").setDescription("Manage modmail")
-            .addSubcommand((sub) => 
-                sub.setName("enable").setDescription("Enable modmail")
-                .addChannelOption((option) => 
-                    option.setName("channel").setDescription("Channel where modmail will be sent").setRequired(true)
-                )
-            )
-            .addSubcommand((sub) => 
-                sub.setName("edit").setDescription("Edit the channel for modmail")
-                .addChannelOption((option) => 
-                    option.setName("channel").setDescription("New channel for modmail").setRequired(true)
-                )
-            )
-            .addSubcommand((sub) => 
-                sub.setName("disable").setDescription("Disable modmail")
-            )
-            .addSubcommand((sub) => 
-                sub.setName("get").setDescription("Get your modmail config")
-            )
         ),
 
     async execute(interaction) {
@@ -500,48 +479,6 @@ module.exports = {
             }
         } // end of group suggestions 
 
-        if(group === "modmail") {
-            const status = getModMail(interaction.guild.id);
-
-            if(sub === "enable") {
-                if(status.enabled) return interaction.reply({content: "❌ Modmail is already enabled.", flags: MessageFlags.Ephemeral});
-
-                const channel = interaction.options.getChannel("channel", true);
-
-                enableModMail(interaction.guild.id, channel.id);
-
-                return interaction.reply({content: "✅ ModMail enabled!"});
-            };
-
-            if(sub === "edit") {
-                if(!status.enabled) return interaction.reply({content: "❌ Modmail is disabled. Enable: /manage modmail enable", flags: MessageFlags.Ephemeral});
-
-                const channel = interaction.options.getChannel("channel", true);
-
-                editModMailChannel(interaction.guild.id, channel.id);
-
-                return interaction.reply("✅ Channel Edited!");
-            };
-
-
-            if(sub === "disable") {
-                if(!status.enabled) return interaction.reply({content: "❌ Modmail is already disabled!", flags: MessageFlags.Ephemeral});
-
-                disableModMail(interaction.guild.id);
-
-                return interaction.reply("✅ Modmail disabled!");
-            };
-
-
-            if(sub === "get") {
-                const embed = new EmbedBuilder()
-                    .setTitle("Modmail status")
-                    .setDescription(`**Enabled?** ${status.enabled ? "✅" : "❌"}\n**Channel:** ${status.channelId ? `<#${status.channelId}>` : "N/A"}`)
-                    .setColor(0xe410d3)
-                    .setTimestamp();
-
-                return interaction.reply({embeds: [embed]});
-            }
-        } // end of group modmail
+        
     }
 }
