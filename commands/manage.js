@@ -12,7 +12,6 @@ const { ignoreChannel, unignoreChannel, ignoreUser, unignoreUser, getAllChannels
 
 const { enableSuggestions, editChannel, getSuggest, disableSuggestions } = require('../modules/suggestions');
 
-const { enableModMail, editModMailChannel, disableModMail, getModMail } = require('../modules/modmail');
 
 
 module.exports = {
