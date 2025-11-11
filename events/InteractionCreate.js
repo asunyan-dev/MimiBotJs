@@ -157,78 +157,10 @@ module.exports = {
 
                 if(!owner) return interaction.reply({content: "❌ There was an error, please try again later.", flags: MessageFlags.Ephemeral});
 
-                const row = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId(`request_${interaction.user.id}`)
-                        .setLabel("Reply")
-                        .setStyle(ButtonStyle.Primary)
-                ).toJSON();
-
-                await owner.send({content: `New request from ${name} (username: ${interaction.user.username}):\n\n${text}`, components: [row]});
+                await owner.send({content: `New request from ${name} (username: ${interaction.user.username}):\n\n${text}`});
 
                 return interaction.reply({content: "✅ Request sent.", flags: MessageFlags.Ephemeral});
             };
-
-
-            if(interaction.customId === "modmail") {
-                const message = interaction.fields.getTextInputValue("message");
-                const modmail = getModMail(interaction.guild.id);
-
-                const embed = new EmbedBuilder()
-                    .setTitle(`New message from ${interaction.user.displayName}`)
-                    .setDescription(message)
-                    .setThumbnail(interaction.user.displayAvatarURL({size: 512}))
-                    .setColor(0xe410d3)
-                    .setFooter({text: `User ID: ${interaction.user.id}`})
-                    .setTimestamp();
-
-                const row = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId(`mail_${interaction.user.id}`)
-                        .setLabel("Reply")
-                        .setStyle(ButtonStyle.Primary)
-                ).toJSON();
-
-                try {
-                    await sendMessage(client, interaction.guild.id, modmail.channelId, {embeds: [embed], components: [row]});
-                } catch (err) {
-                    console.error(err);
-                    return interaction.reply({content: "❌ Failed to send message, try again later.", flags: MessageFlags.Ephemeral});
-                };
-
-                return interaction.reply({content: "✅ Message sent! Remember to have your DMs opened to me, otherwise staff won't be able to reply to you.", flags: MessageFlags.Ephemeral});
-            };
-
-            if(interaction.customId.startsWith("mail_reply_")) {
-                const userId = interaction.customId.replace("mail_reply_", "");
-
-                const member = await interaction.guild.members.fetch(userId);
-
-                const message = interaction.fields.getTextInputValue("message");
-
-                const embed = new EmbedBuilder()
-                    .setTitle("Reply from staff!")
-                    .setDescription(message)
-                    .setColor(0xe410d3)
-                    .setFooter({text: "This message was sent by server staff"})
-                    .setTimestamp();
-
-                const row = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId(`reply_${userId}`)
-                        .setLabel("Reply")
-                        .setStyle(ButtonStyle.Primary)
-                ).toJSON();
-
-                try {
-                    member.send({embeds: [embed], components: [row]});
-                } catch (err) {
-                    console.error(err);
-                    return interaction.reply({content: "❌ Failed to DM member.", flags: MessageFlags.Ephemeral});
-                };
-
-                return interaction.reply({content: "Reply sent.", flags: MessageFlags.Ephemeral});
-            }
         }
     }
 }
