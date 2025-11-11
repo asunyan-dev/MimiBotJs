@@ -32,6 +32,6 @@ const rest = new REST({version: "10"}).setToken(token);
 
         console.log("Refreshed dev commands")
     } catch (err) {
-        console.error(error);
+        console.error(err);
     }
-})
+})()
