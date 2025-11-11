@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config.json');
 
+const { enableWelcome, editWelcome, getWelcome } = require('./modules/welcoming');
+
 
 const client = new Client({
     intents: [
@@ -127,6 +129,72 @@ client.on(Events.InteractionCreate, async (interaction) => {
             ).toJSON();
 
         await interaction.showModal(modal);
+    }
+});
+
+
+
+
+// welcome modals
+
+
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if(!interaction.isModalSubmit()) return;
+
+
+    if(interaction.customId.startsWith("enable_welcome_")) {
+        const guildId = interaction.customId.replace("enable_welcome_", "");
+        const pingValues = interaction.fields.getStringSelectValues("ping");
+        const channelValues = interaction.fields.getSelectedChannels("channel", true);
+        const message = interaction.fields.getTextInputValue("message");
+
+        const ping = pingValues[0];
+        const channel = channelValues.first();
+
+
+        enableWelcome(guildId, channel.id, ping, message);
+
+        return interaction.reply({content: "✅ Welcome messages enabled!"});
+    };
+
+    if(interaction.customId.startsWith("edit_welcome_")) {
+        const guildId = interaction.customId.replace("edit_welcome_", "");
+        const pingValues = interaction.fields.getStringSelectValues("ping");
+        const channelValues = interaction.fields.getSelectedChannels("channel", false);
+        const message = interaction.fields.getTextInputValue("message");
+
+        const status = getWelcome(guildId);
+
+        let ping;
+        if(!pingValues.length) {
+            if(status.ping) {
+                ping = "yes";
+            } else {
+                ping = "no";
+            };
+        } else {
+            ping = pingValues[0];
+        }
+
+        let channel;
+        if(!channelValues) {
+            channel = status.channelId;
+        } else {
+            channel = channelValues.first().id;
+        };
+
+        let text;
+        if(!message) {
+            text = status.message;
+        } else {
+            text = message;
+        };
+
+        editWelcome(guildId, channel, ping, text);
+
+        return interaction.reply({content: "✅ Welcome messages edited!"});
+        
     }
 })
 
