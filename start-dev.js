@@ -254,4 +254,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 })
 
 
-client.login(config.token);
+client.login(config.token_dev);
