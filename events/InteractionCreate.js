@@ -9,7 +9,6 @@ const { EmbedBuilder } = require('@discordjs/builders');
 
 const config = require('../config.json');
 
-const { getModMail } = require('../modules/modmail');
 
 const { sendMessage } = require('../modules/sendMessage');
 const { ActionRowBuilder } = require('@discordjs/builders');
