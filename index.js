@@ -118,6 +118,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return interaction.reply({content: "✅ Welcome messages edited!"});
         
     }
+});
+
+
+client.on(Events.GuildMemberAdd, async (member) => {
+    const status = getWelcome(member.guild.id);
+
+    if(!status.enabled) return;
+
+    let content = "";
+    if(status.ping) content = `<@${member.id}>`;
+
+    const embed = new EmbedBuilder()
+        .setTitle(`Welcome to ${member.guild.name}, ${member.displayName}`)
+        .setThumbnail(member.avatarURL({size: 512}))
+        .setColor(0xe410d3)
+        .setDescription(status.message)
+        .setTimestamp();
+
+    try {
+        await sendMessage(client, member.guild.id, status.channelId, {content: content, embeds: [embed]});
+    } catch (err) {
+        console.log(err);
+    }
 })
 
 

@@ -56,4 +56,7 @@ function getCooldown(userId, command) {
     ensureUser(data, userId);
     ensureCommand(data, userId, command);
     return data[userId][command];
-}
+};
+
+
+module.exports = { setCooldown, removeCooldown, getCooldown };

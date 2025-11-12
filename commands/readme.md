@@ -17,6 +17,7 @@
 - `/kick` - Kick a member (Requires "Kick Members" permission).
 - `/manage` - All management commands, for example for logs or custom roles (requires admin perms).
 - `/mute` - Mute a member (require moderate members permission).
+- `/reputation` - Give a reputation point to a user (24h cooldown).
 - `/request` - Request a feature or command to the bot owner.
 - `/roleinfo` - Get info on a role.
 - `/rps` - Play rock paper scissors against the bot.
@@ -29,4 +30,5 @@
 - `/warn` - Warn a user (if feature enabled).
 - `/warnings` - Get list of warnings for a user (if feature enabled).
 - `/weather` - Get current weather for a city.
+- `/welcoming` - Set up welcome messages for your server (require admin perms).
 - `/wyr` - Get a "Would you rather" question.
