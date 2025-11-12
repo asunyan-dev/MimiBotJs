@@ -25,6 +25,8 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
+        const sub = interaction.options.getSubcommand();
+
         const status = getWelcome(interaction.guild.id);
 
         if(sub === "enable") {
