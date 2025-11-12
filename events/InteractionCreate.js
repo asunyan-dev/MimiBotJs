@@ -14,7 +14,6 @@ const { sendMessage } = require('../modules/sendMessage');
 const { ActionRowBuilder } = require('@discordjs/builders');
 const { ButtonBuilder } = require('@discordjs/builders');
 
-const { getAll, getUpdatesStatus } = require('../modules/updates');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -90,26 +89,6 @@ module.exports = {
             if(interaction.customId === "changelog") {
                 const version = interaction.fields.getTextInputValue("version");
                 const details = interaction.fields.getTextInputValue("details");
-
-                const allUpdates = getAll();
-
-                const guilds = Object.keys(allUpdates);
-
-                const embed = new EmbedBuilder()
-                    .setTitle(`${client.user.tag} - version ${version}`)
-                    .setDescription(details)
-                    .setColor(0xe410d3)
-                    .setThumbnail(client.user.avatarURL({size: 512}))
-                    .setTimestamp();
-
-                guilds.forEach(async guild => {
-                    const channel = guild.channelId;
-                    try {
-                        await sendMessage(client, guild, channel, {embeds: [embed]});
-                    } catch (err) {
-                        console.log(err);
-                    }
-                })
 
                 addChange(version, details);
 
