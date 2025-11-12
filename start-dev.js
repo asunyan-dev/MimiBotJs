@@ -65,6 +65,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if(!interaction.isModalSubmit()) return;
 
 
+
     if(interaction.customId.startsWith("enable_welcome_")) {
         const guildId = interaction.customId.replace("enable_welcome_", "");
         const pingValues = interaction.fields.getStringSelectValues("ping");
@@ -121,4 +122,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 })
 
 
-client.login(config.token);
+client.login(config.token_dev);

@@ -1,6 +1,7 @@
 const { Events, EmbedBuilder } = require('discord.js');
 const { getLog } = require('../modules/logs');
 const { sendMessage } = require('../modules/sendMessage');
+const { getWelcome } = require('../modules/welcoming');
 
 
 module.exports = {
@@ -27,6 +28,26 @@ module.exports = {
             await sendMessage(client, guildId, channelId, {embeds: [embed]});
         } catch (error) {
             console.log(error);
+        };
+
+        const welcomeStatus = getWelcome(member.guild.id);
+        if(!welcomeStatus.enabled) return;
+
+        let content = "";
+
+        if(welcomeStatus.ping) content = `<@${member.id}>`
+
+        const welcomeEmbed = new EmbedBuilder()
+            .setTitle(member.displayName)
+            .setThumbnail(member.displayAvatarURL({size: 512}))
+            .setDescription(welcomeStatus.message)
+            .setColor(0xe410d3)
+            .setTimestamp();
+
+        try {
+            await sendMessage(client, member.guild.id, welcomeStatus.channelId, {content: content, embeds: [welcomeEmbed]});
+        } catch (err) {
+            console.log(err);
         }
     }
 }

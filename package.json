@@ -9,7 +9,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "deploy-commands": "node deploy-commands.js"
+    "deploy-commands": "node deploy-commands.js",
+    "deploy-dev": "node deploy-dev.js",
+    "start-dev": "node start-dev.js"
   },
   "dependencies": {
     "discord.js": "^14.23.2",
