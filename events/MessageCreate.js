@@ -1,5 +1,8 @@
 const { Events } = require('discord.js');
 const { getAfk, removeAfk } = require('../modules/afk');
+const { getCooldown, setCooldown } = require('../modules/cooldowns');
+const ms = require('ms');
+const { addExp } = require('../modules/exp');
 
 
 module.exports = {
@@ -9,6 +12,18 @@ module.exports = {
         if(!message.guild) return;
         if(message.author.bot) return;
 
+        const cooldown = getCooldown(message.author.id, "exp");
+
+        let amount;
+
+        if(Date.now() < cooldown) {
+            amount = 0;
+            addExp(message.author.id, amount);
+        } else {
+            amount = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+            addExp(message.author.id, amount);
+            setCooldown(message.author.id, "exp", ms("15 seconds"));
+        };
 
         const status = await getAfk(message.author.id);
 
