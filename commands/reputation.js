@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags, InteractionContextType } = require('discord.js');
 const { getCooldown, setCooldown } = require('../modules/cooldowns');
 const { addRep } = require('../modules/exp');
 const ms = require("ms");
@@ -8,6 +8,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("reputation")
         .setDescription("Give a reputation point to a user")
+        .setContexts(InteractionContextType.Guild, InteractionContextType.PrivateChannel)
         .addUserOption((option) => 
             option.setName("user").setDescription("Target user").setRequired(true)
         ),

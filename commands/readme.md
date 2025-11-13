@@ -17,6 +17,7 @@
 - `/kick` - Kick a member (Requires "Kick Members" permission).
 - `/manage` - All management commands, for example for logs or custom roles (requires admin perms).
 - `/mute` - Mute a member (require moderate members permission).
+- `/profile` - See a user EXP and Reputation points.
 - `/reputation` - Give a reputation point to a user (24h cooldown).
 - `/request` - Request a feature or command to the bot owner.
 - `/roleinfo` - Get info on a role.
