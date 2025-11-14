@@ -20,9 +20,6 @@ module.exports = {
         )
         .addSubcommand((sub) => 
             sub.setName("get").setDescription("Get your server config.")
-        )
-        .addSubcommand((sub) => 
-            sub.setName("help").setDescription("Get help for welcoming messages")
         ),
 
     async execute(interaction) {
