@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder, ModalBuilder, TextInputStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder, ModalBuilder, TextInputStyle, ComponentType, TextDisplayBuilder } = require('discord.js');
 
 const { disableWelcome, getWelcome } = require('../modules/welcoming');
 
@@ -20,6 +20,9 @@ module.exports = {
         )
         .addSubcommand((sub) => 
             sub.setName("get").setDescription("Get your server config.")
+        )
+        .addSubcommand((sub) => 
+            sub.setName("help").setDescription("Get help for welcoming messages")
         ),
 
     async execute(interaction) {
@@ -36,6 +39,10 @@ module.exports = {
             const modal = new ModalBuilder()
                 .setCustomId(`enable_welcome_${interaction.guild.id}`)
                 .setTitle("Enable welcome messages")
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent("List of variables for the message:\n\n`{user}` - Mention the user\n`{username}` - Display the username\n`{server}` - Display server name\n`{membercount}` - Display the server's member count")
+                )
                 .addLabelComponents(
                     {
                         type: ComponentType.Label,
@@ -87,6 +94,10 @@ module.exports = {
             const modal = new ModalBuilder()
                 .setCustomId(`edit_welcome_${interaction.guild.id}`)
                 .setTitle("Edit welcome messages")
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent("List of variables for the message:\n\n`{user}` - Mention the user\n`{username}` - Display the username\n`{server}` - Display server name\n`{membercount}` - Display the server's member count")
+                )
                 .addLabelComponents(
                     {
                         type: ComponentType.Label,
