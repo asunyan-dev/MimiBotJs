@@ -129,11 +129,19 @@ client.on(Events.GuildMemberAdd, async (member) => {
     let content = "";
     if(status.ping) content = `<@${member.id}>`;
 
+    let msg = status.message;
+
+    msg = msg
+        .replace(/{user}/g, `${member}`)
+        .replace(/{server}/g, member.guild.name)
+        .replace(/{membercount}/g, member.guild.memberCount)
+        .replace(/{username}/g, member.user.username)
+
     const embed = new EmbedBuilder()
         .setTitle(`Welcome to ${member.guild.name}, ${member.displayName}`)
         .setThumbnail(member.avatarURL({size: 512}))
         .setColor(0xe410d3)
-        .setDescription(status.message)
+        .setDescription(msg)
         .setTimestamp();
 
     try {
