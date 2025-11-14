@@ -4,6 +4,7 @@ const path = require('path');
 const config = require('./config.json');
 
 const { enableWelcome, editWelcome, getWelcome } = require('./modules/welcoming');
+const { sendMessage } = require('./modules/sendMessage');
 
 
 const client = new Client({

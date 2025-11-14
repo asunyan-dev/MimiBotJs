@@ -20,9 +20,17 @@ module.exports = {
 
         const question = interaction.options.getString("question", true);
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         const res = await neko.eightBall({text: question});
 
-        if(!res.response) return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+        if(!res.response) {
+            errorEmbed.setDescription("There was an error with the API, please try again later.")
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        }
 
         const embed = new EmbedBuilder()
             .setTitle("🎱 The magic 8 ball")

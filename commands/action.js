@@ -37,17 +37,28 @@ module.exports = {
         if(sub === "smile") title = `${interaction.user.displayName} smiles`;
         if(sub === "wave") title = `${interaction.user.displayName} waves`;
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         try {
 
             const res = await fetch(`https://api.waifu.pics/sfw/${sub}`).catch(() => null);
 
-            if(!res || res.ok) {
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
-            };
+            if(!res || !res.ok) {
+                errorEmbed.setDescription("There was an error with the API, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            }
 
             const data = await res.json().catch(() => null);
 
-            if(!data) return interaction.reply({content: "❌ Failed to get image, please try again later.", flags: MessageFlags.Ephemeral});
+            if(!data) {
+                errorEmbed.setDescription("Failed to get image, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            }
+
+            
 
             const embed = new EmbedBuilder()
                 .setTitle(title)
@@ -59,7 +70,8 @@ module.exports = {
             return interaction.reply({embeds: [embed]});
         } catch(error) {
             console.error(error);
-            return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("There was an error with the API, please try again later.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }
