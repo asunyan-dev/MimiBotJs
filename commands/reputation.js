@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageFlags, InteractionContextType } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags, InteractionContextType, EmbedBuilder } = require('discord.js');
 const { getCooldown, setCooldown } = require('../modules/cooldowns');
 const { addRep } = require('../modules/exp');
 const ms = require("ms");
@@ -15,22 +15,35 @@ module.exports = {
 
 
     async execute(interaction) {
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
         const user = interaction.options.getUser("user", true);
 
         const cooldown = getCooldown(interaction.user.id, "reputation");
 
         if(Date.now() < cooldown) {
-            return interaction.reply({content: `❌ You're on cooldown! You can use /reputation <t:${Math.floor(cooldown / 1000)}:R>.`, flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription(`You're on cooldown! You can use \`/reputation\` <t:${Math.floor(cooldown / 1000)}:R>.`);
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
         if(user.id === interaction.user.id) {
-            return interaction.reply({content: "❌ You can't give a reputation point to yourself!", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("You can't give a reputation point to yourself!");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
         addRep(user.id);
 
         setCooldown(interaction.user.id, "reputation", ms("24 hours"));
 
-        return interaction.reply({content: `✅ Successfully given a reputation point to ${user.displayName}!`});
+        successEmbed.setDescription(`Given a reputation point to <@${user.id}>!`);
+        return interaction.reply({embeds: [successEmbed]});
     }
 }

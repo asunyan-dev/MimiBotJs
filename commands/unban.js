@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder } = require('discord.js');
 
 
 module.exports = {
@@ -14,20 +14,38 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
-        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) return interaction.reply({content: "❌ I am missing permissions: `BAN_MEMBERS`.", flags: MessageFlags.Ephemeral});
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+            errorEmbed.setDescription("I am missing permissions: `BAN_MEMBERS`.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         const id = interaction.options.getString("id", true);
 
         const ban = await interaction.guild.bans.fetch(id).catch(() => null);
 
-        if(!ban) return interaction.reply({content: "❌ Couldn't find banned user. Are they actually banned?", flags: MessageFlags.Ephemeral});
+        if(!ban) {
+            errorEmbed.setDescription("Couldn't find banned user. Are they actually banned?");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         try {
             await interaction.guild.bans.remove(id);
-            return interaction.reply({content: "✅ User unbanned.", flags: MessageFlags.Ephemeral});
+            successEmbed.setDescription("User unbanned.");
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         } catch (err) {
             console.error(err);
-            return interaction.reply({content: "❌ Failed to unban user. Do I have the right permissions?", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("Failed to unban user. Do I have the right permissions?");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }

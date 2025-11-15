@@ -18,10 +18,26 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
-        const status = getWarningStatus(interaction.guild.id);
-        if(!status.enabled) return interaction.reply({content: "❌ Warnings are disabled.", flags: MessageFlags.Ephemeral});
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
 
-        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ModerateMembers)) return interaction.reply({content: "❌ I am missing permissions: `MODERATE_MEMBERS`.", flags: MessageFlags.Ephemeral});
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+        const status = getWarningStatus(interaction.guild.id);
+        if(!status.enabled) {
+            errorEmbed.setDescription("Warnings are disabled.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ModerateMembers)) {
+            errorEmbed.setDescription("I am missing permissions: `MODERATE_MEMBERS`");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        }
 
 
         const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
@@ -29,7 +45,25 @@ module.exports = {
 
         const user = interaction.options.getUser("user", true);
         const target = await interaction.guild.members.fetch(user.id).catch(() => null);
-        if(!target) return interaction.reply({content: "❌ Member not found.", flags: MessageFlags.Ephemeral});
+        if(!target) {
+            errorEmbed.setDescription("Member not found.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        if(member.roles.highest.position <= target.roles.highest.position) {
+            errorEmbed.setDescription("You can't warn someone with a higher role than you.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        if(target.roles.highest.position >= interaction.guild.members.me.roles.highest.position) {
+            errorEmbed.setDescription("I can't warn someone with a higher role than me.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        if(!target.moderatable) {
+            errorEmbed.setDescription("This member can't be warned.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         const reason = interaction.options.getString("reason", true);
 
@@ -45,10 +79,12 @@ module.exports = {
 
         try {
             await target.send({embeds: [embed]});
-            return interaction.reply({content: "✅ Member warned.", flags: MessageFlags.Ephemeral});
+            successEmbed.setDescription("Member warned.");
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         } catch (err) {
             console.error(err);
-            return interaction.reply({content: "✅ Member warned.\n⚠️ Failed to DM member. They have DMs closed.", flags: MessageFlags.Ephemeral});
+            successEmbed.setDescription("Member warned!\n⚠️ Failed to DM member. They have DMs closed.");
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }

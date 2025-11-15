@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, MessageFlags, EmbedBuilder } = require('discord.js');
 
 const { mkRole, getRole, getRoleStatus, removeRole, getReference } = require('../modules/customRole');
 
@@ -50,6 +50,16 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
         const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
         if(!member) return;
 
@@ -57,7 +67,10 @@ module.exports = {
 
         const guildStatus = getRoleStatus(interaction.guild.id);
 
-        if(!guildStatus) return interaction.reply({content: "❌ Custom roles are disabled!", flags: MessageFlags.Ephemeral});
+        if(!guildStatus) {
+            errorEmbed.setDescription("Custom roles are disabled in this server.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
 
         const status = getRole(interaction.guild.id, interaction.user.id);
@@ -65,14 +78,16 @@ module.exports = {
 
         if(sub === "make") {
             if(status) {
-                return interaction.reply({content: "❌ You already have a custom role! Use /custom-role edit to edit it!", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("You already have a custom role! Please use `/custom-role edit` to edit it!");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
             const name = interaction.options.getString("name", true);
             const color = interaction.options.getString("color", true);
 
             if(!color.startsWith("#")) {
-                return interaction.reply({content: "❌ Invalid color format! Must start with #. Example: #e410d3", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Invalid color format! It must start with `#`.\nExample: `#e410d3`.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -80,7 +95,10 @@ module.exports = {
 
             const reference = await interaction.guild.roles.fetch(guildRef).catch(() => null);
 
-            if(!reference) return interaction.reply({content: "❌ There was an error, please try again later.", flags: MessageFlags.Ephemeral});
+            if(!reference) {
+                errorEmbed.setDescription("There was an error, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
             try {
                 const role = await interaction.guild.roles.create({
@@ -95,16 +113,19 @@ module.exports = {
 
                 mkRole(interaction.guild.id, interaction.user.id, role.id);
 
-                return interaction.reply({content: "✅ Role created."});
+                successEmbed.setDescription("Role created and given to you!");
+                return interaction.reply({embeds: [successEmbed]});
             } catch (error) {
                 console.error(error);
-                return interaction.reply({content: "❌ Failed to make role. Please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Failed to make role. Please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             }
         };
 
         if(sub === "edit") {
             if(!status) {
-                return interaction.reply({content: "❌ You don't have a custom role yet! Use /custom-role make to create one!", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("You don't have a custom role yet! Please use `/custom-role make` to create one!");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -112,7 +133,8 @@ module.exports = {
             const color = interaction.options.getString("color", true);
 
             if(!color.startsWith("#")) {
-                return interaction.reply({content: "❌ Invalid color format, must start with #. Example: #e410d3", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Invalid color format! It must start with `#`.\nExample: `#e410d3`.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -120,7 +142,8 @@ module.exports = {
 
             if(!role) {
                 removeRole(interaction.guild.id, interaction.user.id);
-                return interaction.reply({content: "❌ Your role couldn't be found in the server. Please make another one using /custom-role make.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Your custom role couldn't be found in the server. Please make another one using `/custom-role make`.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -132,17 +155,20 @@ module.exports = {
                     }
                 });
 
-                return interaction.reply("✅ Role edited.");
+                successEmbed.setDescription("Role edited!");
+                return interaction.reply({embeds: [successEmbed]});
             } catch (error) {
                 console.error(error);
-                return interaction.reply({content: "❌ Failed to edit role, please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Failed to edit role, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
 
 
         if(sub === "remove") {
             if(!status) {
-                return interaction.reply({content: "❌ You don't have a custom role, no need to use this command!", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("You don't have a custom role, no need to use this command.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -150,16 +176,19 @@ module.exports = {
 
             if(!role) {
                 removeRole(interaction.guild.id, interaction.user.id);
-                return interaction.reply({content: "✅ Role removed!"});
+                successEmbed.setDescription("Role deleted and removed!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
             try {
                 await interaction.guild.roles.delete(role);
                 removeRole(interaction.guild.id, interaction.user.id);
-                return interaction.reply({content: "✅ Role removed!"});
+                successEmbed.setDescription("Role deleted and removed!");
+                return interaction.reply({embeds: [successEmbed]});
             } catch (error) {
                 console.error(error);
-                return interaction.reply({content: "❌ Failed to remove role, please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Failed to remove role, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             }
         }
     }

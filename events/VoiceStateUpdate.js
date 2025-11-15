@@ -64,23 +64,26 @@ module.exports = {
         };
 
 
-        if(oldState.channel !== newState.channel) {
+        if(oldState.channel && newState.channel) {
             const oldStatus = getChannel(guildId, oldState.channel.id);
             const newStatus = getChannel(guildId, newState.channel.id);
 
             if(oldStatus || newStatus) return;
 
-            const embed = new EmbedBuilder()
-                .setTitle("Moved voice")
-                .setDescription(`<@${newState.member.id}> moved from voice channel <#${oldState.channel.id}> to voice channel <#${newState.channel.id}>`)
-                .setColor(0xe410d3)
-                .setFooter({text: `User ID: ${newState.member.id}`})
-                .setTimestamp();
+            if(oldState.channel !== newState.channel) {
 
-            try {
-                await sendMessage(client, guildId, channelId, {embeds: [embed]});
-            } catch (err) {
-                console.log(err);
+                const embed = new EmbedBuilder()
+                    .setTitle("Moved voice")
+                    .setDescription(`<@${newState.member.id}> moved from voice channel <#${oldState.channel.id}> to voice channel <#${newState.channel.id}>`)
+                    .setColor(0xe410d3)
+                    .setFooter({text: `User ID: ${newState.member.id}`})
+                    .setTimestamp();
+
+                try {
+                    await sendMessage(client, guildId, channelId, {embeds: [embed]});
+                } catch (err) {
+                    console.log(err);
+                }
             }
         }
     }

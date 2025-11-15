@@ -13,6 +13,11 @@ module.exports = {
 
         const choices = ["rock", "paper", "scissors"];
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         const embed = new EmbedBuilder()
             .setTitle("Make your choice!")
             .setDescription("Choose between `rock`, `paper` and `scissors`.")
@@ -38,7 +43,10 @@ module.exports = {
         });
 
         collector.on("collect", async (i) => {
-            if(i.user.id !== interaction.user.id) return interaction.reply({content: "❌ This menu is not for you!", flags: MessageFlags.Ephemeral});
+            if(i.user.id !== interaction.user.id) {
+                errorEmbed.setDescription("This menu is not for you!");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            }
 
             const choice = i.values[0];
 

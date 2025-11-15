@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, ModalBuilder, ComponentType, TextInputStyle } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, ModalBuilder, ComponentType, TextInputStyle, EmbedBuilder } = require('discord.js');
 
 const { getWarningStatus, getWarnings } = require('../modules/warning');
 
@@ -16,16 +16,25 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         const status = getWarningStatus(interaction.guild.id);
 
-        if(!status.enabled) return interaction.reply({content: "❌ Warnings are disabled for the server.", flags: MessageFlags.Ephemeral});
+        if(!status.enabled) {
+            errorEmbed.setDescription("Warnings are disabled for this server.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         const user = interaction.options.getUser("user", true);
 
         const warnings = getWarnings(interaction.guild.id, user.id);
 
         if(warnings.length === 0) {
-            return interaction.reply({content: "❌ This member has no warnings.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("This member has no warnings.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
 
