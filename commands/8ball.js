@@ -20,6 +20,11 @@ module.exports = {
 
         const question = interaction.options.getString("question", true);
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         const res = await neko.eightBall({text: question});
 
         let errorEmbed = new EmbedBuilder()
