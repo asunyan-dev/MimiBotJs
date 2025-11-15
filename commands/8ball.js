@@ -26,12 +26,6 @@ module.exports = {
             .setTimestamp();
 
         const res = await neko.eightBall({text: question});
-
-        let errorEmbed = new EmbedBuilder()
-            .setTitle("❌ Error")
-            .setColor("Red")
-            .setTimestamp();
-
         if(!res.response) {
             errorEmbed.setDescription("There was an error with the API, please try again later.");
             return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
