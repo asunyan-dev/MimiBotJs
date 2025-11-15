@@ -49,16 +49,14 @@ module.exports = {
             if(!res || !res.ok) {
                 errorEmbed.setDescription("There was an error with the API, please try again later.");
                 return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-            }
+            };
 
             const data = await res.json().catch(() => null);
 
             if(!data) {
                 errorEmbed.setDescription("Failed to get image, please try again later.");
                 return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-            }
-
-            
+            };
 
             const embed = new EmbedBuilder()
                 .setTitle(title)

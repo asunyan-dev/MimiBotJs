@@ -12,18 +12,25 @@ module.exports = {
     async execute(interaction) {
         const query = interaction.options.getString("location", true);
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         try {
 
             const res = await fetch(`https://api.popcat.xyz/v2/weather?q=${encodeURIComponent(query)}`).catch(() => null);
 
             if(!res || !res.ok) {
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("There was an error with the API, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
             const data = await res.json().catch(() => null);
 
             if(!data || data.error) {
-                return interaction.reply({content: "❌ Failed to get weather result, please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("Failed to get weather result, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
             const weather = data.message[0];
@@ -41,7 +48,8 @@ module.exports = {
             return interaction.reply({embeds: [embed]});
         } catch (err) {
             console.error(err);
-            return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("There was an error with the API, please try again later.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }

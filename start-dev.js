@@ -65,7 +65,10 @@ for (const file of eventFiles) {
 client.on(Events.InteractionCreate, async (interaction) => {
     if(!interaction.isModalSubmit()) return;
 
-
+    let successEmbed = new EmbedBuilder()
+        .setTitle("✅ Success!")
+        .setColor("Green")
+        .setTimestamp();
 
     if(interaction.customId.startsWith("enable_welcome_")) {
         const guildId = interaction.customId.replace("enable_welcome_", "");
@@ -79,7 +82,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         enableWelcome(guildId, channel.id, ping, message);
 
-        return interaction.reply({content: "✅ Welcome messages enabled!"});
+        successEmbed.setDescription("Welcome messages enabled!");
+        return interaction.reply({embeds: [successEmbed]});
     };
 
     if(interaction.customId.startsWith("edit_welcome_")) {
@@ -117,7 +121,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         editWelcome(guildId, channel, ping, text);
 
-        return interaction.reply({content: "✅ Welcome messages edited!"});
+        successEmbed.setDescription("Welcome messages edited!");
+        return interaction.reply({embeds: [successEmbed]});
         
     }
 });

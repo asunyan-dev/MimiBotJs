@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder } = require('discord.js');
 
 
 module.exports = {
@@ -23,7 +23,20 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
-        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) return interaction.reply({content: "❌ I am missing permissions: `BAN_MEMBERS`.", flags: MessageFlags.Ephemeral});
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success")
+            .setColor("Green")
+            .setTimestamp();
+
+        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+            errorEmbed.setDescription("I am missing permissions: `BAN_MEMBERS`.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         const user = interaction.options.getUser("user", true);
 
@@ -33,18 +46,24 @@ module.exports = {
 
         const target = await interaction.guild.members.fetch(user.id).catch(() => null);
 
-        if(!target) return interaction.reply({content: "❌ Member not found.", flags: MessageFlags.Ephemeral});
-
-        if(member.roles.highest.position <= target.roles.highest.position) {
-            return interaction.reply({content: "❌ You can't ban someone with a higher or equal role with you.", flags: MessageFlags.Ephemeral});
+        if(!target) {
+            errorEmbed.setDescription("Member not found.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
-        if(target.roles.highest.position >= interaction.guild.members.me.highest.position) {
-            return interaction.reply({content: "❌ I can't ban someone with a higer or equal role with me.", flags: MessageFlags.Ephemeral});
+        if(member.roles.highest.position <= target.roles.highest.position) {
+            errorEmbed.setDescription("You can't ban someone with a higher role than you.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        if(target.roles.highest.position >= interaction.guild.members.me.roles.highest.position) {
+            errorEmbed.setDescription("I can't ban someone with a higher role than me.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
         if(!target.bannable) {
-            return interaction.reply({content: "❌ This member can't be banned", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("This member cannot be banned.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
 
@@ -52,10 +71,12 @@ module.exports = {
 
         try {
             await target.ban({reason: reason});
-            return interaction.reply({content: "✅ Member banned.", flags: MessageFlags.Ephemeral});
+            successEmbed.setDescription("Member banned.");
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         } catch (error) {
             console.error(error);
-            return interaction.reply({content: "❌ Failed to ban member. Do I have the right permissions?", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("Failed to ban member. Do I have the right permissions?");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }

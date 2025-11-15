@@ -25,12 +25,26 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
         const sub = interaction.options.getSubcommand();
 
         const status = getWelcome(interaction.guild.id);
 
         if(sub === "enable") {
-            if(status.enabled) return interaction.reply({content: "❌ Welcome messages are already enabled. Type /welcoming edit to edit them.", flags: MessageFlags.Ephemeral});
+
+            if(status.enabled) {
+                errorEmbed.setDescription("Welcome messages are already enabled. Type `/welcoming edit` to edit them.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
 
             const modal = new ModalBuilder()
@@ -85,7 +99,10 @@ module.exports = {
 
 
         if(sub === "edit") {
-            if(!status.enabled) return interaction.reply({content: "❌ Welcome messages are disabled. Type /welcoming enable to enable them.", flags: MessageFlags.Ephemeral});
+            if(!status.enabled) {
+                errorEmbed.setDescription("Welcome messages are disabled. Type `/welcoming enable` to enable them.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
 
             const modal = new ModalBuilder()
@@ -141,11 +158,15 @@ module.exports = {
 
 
         if(sub === "disable") {
-            if(!status.enabled) return interaction.reply({content: "❌ Welcome messages are already disabled.", flags: MessageFlags.Ephemeral});
+            if(!status.enabled) {
+                errorEmbed.setDescription("Welcome messages are already disabled.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
             disableWelcome(interaction.guild.id);
 
-            return interaction.reply("✅ Welcome messages disabled!");
+            successEmbed.setDescription("Welcome messages disabled!");
+            return interaction.reply({embeds: [successEmbed]});
         };
 
 

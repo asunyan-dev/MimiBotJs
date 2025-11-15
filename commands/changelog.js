@@ -21,11 +21,19 @@ module.exports = {
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
 
         if(sub === "get") {
             const data = getChange();
 
-            if(data.length === 0) return interaction.reply({content: "❌ There is no changelog yet.", flags: MessageFlags.Ephemeral});
+            if(data.length === 0) {
+                errorEmbed.setDescription("There is no changelog yet.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
             const log = data[data.length - 1];
 
@@ -44,7 +52,8 @@ module.exports = {
 
         if(sub === "add") {
             if(interaction.user.id !== config.owner_id) {
-                return interaction.reply({content: "❌ You can't use this command.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("You can't use this command.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
 

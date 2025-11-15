@@ -12,11 +12,19 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         const user = interaction.options.getUser("user", true);
 
         const member = await interaction.guild.members.fetch(user.id).catch(() => null);
 
-        if(!member) return interaction.reply({content: "❌ Member not found.", flags: MessageFlags.Ephemeral});
+        if(!member) {
+            errorEmbed.setDescription("Member not found.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
 
         const embed = new EmbedBuilder()

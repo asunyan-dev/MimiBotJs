@@ -74,6 +74,12 @@ module.exports = {
             .setFooter({text: "Provided by nekos.life"})
             .setTimestamp();
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setDescription("There was an error with the API, please try again later.")
+            .setTimestamp();
+
         if(sub === "cuddle") {
             try {
                 const cuddle = await neko.cuddle();
@@ -84,7 +90,7 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             } catch (err) {
                 console.error(err);
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
 
@@ -98,7 +104,7 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             } catch (err) {
                 console.error(err);
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
 
@@ -113,7 +119,7 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             } catch (err) {
                 console.error(err);
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
 
@@ -127,7 +133,7 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             } catch (err) {
                 console.error(err);
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
 
@@ -142,7 +148,7 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             } catch (err) {
                 console.error(err);
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
         };
     }

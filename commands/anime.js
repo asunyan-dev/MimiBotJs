@@ -15,19 +15,31 @@ module.exports = {
     async execute(interaction) {
         const query = interaction.options.getString("query", true);
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
         try {
 
             const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=1`).catch(() => null);
 
             if(!res || !res.ok) {
-                return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+                errorEmbed.setDescription("There was an error with the API, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
             };
 
             const data = await res.json().catch(() => null);
-            if(!data) return interaction.reply({content: "❌ Failed to get anime data, please try again later.", flags: MessageFlags.Ephemeral});
 
+            if(!data) {
+                errorEmbed.setDescription("Failed to get anime data, please try again later.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
-            if(!data.data || !data.data.length === 0) return interaction.reply({content: "❌ No anime found with that name.", flags: MessageFlags.Ephemeral});
+            if(!data.data || data.data.length === 0) {
+                errorEmbed.setDescription("No anime found with that name.");
+                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+            };
 
             const anime = data.data[0];
 
@@ -43,7 +55,8 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            return interaction.reply({content: "❌ There was an error with the API, please try again later.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("There was an error with the API, please try again later.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         }
     }
 }

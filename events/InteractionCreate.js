@@ -1,11 +1,10 @@
-const { Events, Collection, MessageFlags, ButtonStyle } = require('discord.js');
+const { Events, Collection, MessageFlags, EmbedBuilder } = require('discord.js');
 
 const { getWarnings } = require('../modules/warning');
 
 const { addChange } = require('../modules/botLogs');
 
 const { getSuggest } = require('../modules/suggestions');
-const { EmbedBuilder } = require('@discordjs/builders');
 
 const config = require('../config.json');
 
@@ -19,6 +18,18 @@ module.exports = {
     name: Events.InteractionCreate,
 
     async execute(interaction, client) {
+
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+
         if(interaction.isChatInputCommand()) {
             const command = client.commands.get(interaction.commandName);
             if(!command) return;
@@ -37,7 +48,8 @@ module.exports = {
 
                 if(now < expirationTime) {
                     const timeLeft = (expirationTime - now) / 1000;
-                    return interaction.reply({content: `🕰️ Please wait ${timeLeft.toFixed(1)} more second(s) before using /${command.data.name} again.`, flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription(`🕰️ Please wait ${timeLeft.toFixed(1)} more second(s) before using /${command.data.name} again.`);
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
             };
 
@@ -49,9 +61,11 @@ module.exports = {
             } catch (err) {
                 console.error(err);
                 if(interaction.replied || interaction.deferred) {
-                    await interaction.followUp({content: "❌ There was an error executing this command!", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("There was an error executing this command!");
+                    await interaction.followUp({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 } else {
-                    await interaction.reply({content: "❌ There was an error executing this command!", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("There was an error executing this command!");
+                    await interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
             };
         };
@@ -73,7 +87,10 @@ module.exports = {
 
                 const warning = warnings.find(warning => warning.id === id);
 
-                if(!warning) return interaction.reply({content: "❌ Case not found.", flags: MessageFlags.Ephemeral});
+                if(!warning) {
+                    errorEmbed.setDescription("Case not found.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const embed = new EmbedBuilder()
                     .setTitle(`${member.displayName} - Case #${id}`)
@@ -92,7 +109,8 @@ module.exports = {
 
                 addChange(version, details);
 
-                return interaction.reply({content: "Done.", flags: MessageFlags.Ephemeral});
+                successEmbed.setDescription("Done!");
+                return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -105,7 +123,10 @@ module.exports = {
 
                 const channel = await interaction.guild.channels.fetch(status.channelId).catch(() => null);
 
-                if(!channel) return interaction.reply({content: "❌ Couldn't find suggestion channel.", flags: MessageFlags.Ephemeral});
+                if(!channel) {
+                    errorEmbed.setDescription("Couldn't find suggestion channel.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const embed = new EmbedBuilder()
                     .setTitle("New suggestion")
@@ -116,14 +137,16 @@ module.exports = {
 
 
                 if(channel.isDMBased() || !channel.isSendable()) {
-                    return interaction.reply({content: "❌ Couldn't send suggestion.", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("Couldn't send suggestion.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
 
                 const reply = await channel.send({embeds: [embed]});
                 await reply.react("⬆️");
                 await reply.react("⬇️");
 
-                return interaction.reply({content: "✅ Suggestion sent!"});
+                successEmbed.setDescription("Suggestion sent!");
+                return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
             };
 
 
@@ -133,11 +156,14 @@ module.exports = {
 
                 const owner = await client.users.fetch(config.owner_id).catch(() => null);
 
-                if(!owner) return interaction.reply({content: "❌ There was an error, please try again later.", flags: MessageFlags.Ephemeral});
-
+                if(!owner) {
+                    errorEmbed.setDescription("There was an error please try again later.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
                 await owner.send({content: `New request from ${name} (username: ${interaction.user.username}):\n\n${text}`});
 
-                return interaction.reply({content: "✅ Request sent.", flags: MessageFlags.Ephemeral});
+                successEmbed.setDescription("Request sent!");
+                return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
             };
         }
     }

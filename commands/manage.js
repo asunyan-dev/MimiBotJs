@@ -139,44 +139,67 @@ module.exports = {
         const group = interaction.options.getSubcommandGroup();
         const sub = interaction.options.getSubcommand();
 
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
 
         if(group === "custom-role") {
             const status = getRoleStatus(interaction.guild.id);
 
             if(sub === "enable") {
-                if(status) return interaction.reply({content: "❌ Custom roles are already enabled in the server!", flags: MessageFlags.Ephemeral});
+
+                if(status) {
+                    errorEmbed.setDescription("Custom roles are already enabled in the server!");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const referenceRole = interaction.options.getRole("reference-role", true);
 
                 if(referenceRole.position > interaction.guild.members.me.roles.highest.position) {
-                    return interaction.reply({content: "❌ Failed to enable custom roles. The reference role is higher than my highest role.", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("Failed to enable custom roles. The reference role is higher than my highest role.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
 
                 enableRoles(interaction.guild.id, referenceRole.id);
 
-                return interaction.reply("✅ Custom roles enabled!");
+                successEmbed.setDescription("Custom roles enabled!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
             if(sub === "edit-reference") {
                 if(!status) {
-                    return interaction.reply({content: "❌ Custom roles are not enabled in the server! Please use /manage custom-role enable to enable them.", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("Custom roles are not enabled in the server! Please use `/mange custom-role enable` to enable them!");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
 
                 const role = interaction.options.getRole("role", true);
 
                 if(role.position > interaction.guild.members.me.roles.highest.position) {
-                    return interaction.reply({content: "❌ Failed to edit reference role, the role you selected is higher than my highest role.", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("Failed to edit reference role, the role you selected is higher than my highest role.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
 
                 editReference(interaction.guild.id, role.id);
 
-                return interaction.reply("✅ Reference role edited!");
+                successEmbed.setDescription("Reference role edited!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
             if(sub === "disable") {
-                if(!status) return interaction.reply({content: "❌ Custom roles are not enabled in the server.", flags: MessageFlags.Ephemeral});
+
+                if(!status) {
+                    errorEmbed.setDescription("Custom roles are not enabled in the server.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const customRoles = getRoles(interaction.guild.id);
 
@@ -191,7 +214,8 @@ module.exports = {
 
                 disableRoles(interaction.guild.id);
 
-                return interaction.reply("✅ Custom roles disabled.");
+                successEmbed.setDescription("Custom roles disabled!");
+                return interaction.reply({embeds: [successEmbed]});
             }
         } // end of group custom role
 
@@ -200,38 +224,51 @@ module.exports = {
             const status = getWarningStatus(interaction.guild.id);
 
             if(sub === "enable") {
-                if(status.enabled) return interaction.reply({content: "❌ Warnings are already enabled for the server.", flags: MessageFlags.Ephemeral});
+                if(status.enabled) {
+                    errorEmbed.setDescription("Warnings are already enabled for the server.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 enableWarn(interaction.guild.id);
 
-                return interaction.reply("✅ Warnings enabled for the server!");
+                successEmbed.setDescription("Warnings enabled for the server!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
             if(sub === "disable") {
-                if(!status.enabled) return interaction.reply({content: "❌ Warnings were not enabled for the server.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("Warnings are not enabled for this server.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 disableWarn(interaction.guild.id);
 
-                return interaction.reply("✅ Warnings disabled for the server.");
+                successEmbed.setDescription("Warnings disabled for the server.");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
             if(sub === "clear-warnings") {
-                if(!status.enabled) return interaction.reply({content: "❌ Warnings are not enabled for the server.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("Warnings are not enabled for this server.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const user = interaction.options.getUser("user", true);
 
                 const warnings = getWarnings(interaction.guild.id, user.id);
 
                 if(warnings.length === 0) {
-                    return interaction.reply({content: "❌ This member had no warnings.", flags: MessageFlags.Ephemeral});
+                    errorEmbed.setDescription("This member has no warnings.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
                 };
 
 
                 clearWarnings(interaction.guild.id, user.id);
 
-                return interaction.reply(`✅ Cleared warnings for ${user.displayName}.`)
+                successEmbed.setDescription(`Cleared warnings for ${user.displayName}.`);
+                return interaction.reply({embeds: [successEmbed]});
             }
         } // end of group warnings
 
@@ -243,7 +280,10 @@ module.exports = {
 
                 const status = getLog(interaction.guild.id, log);
 
-                if(status.enabled) return interaction.reply({content: "❌ This type of logs is already enabled.\nℹ️ Want to edit the channel for this type? Type /manage logs edit", flags: MessageFlags.Ephemeral});
+                if(status.enabled) {
+                    errorEmbed.setDescription("This type of logs is already enabled.\nWant to edit the channel for this type? Type `/manage logs edit`.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
 
                 const embed = new EmbedBuilder()
@@ -268,7 +308,10 @@ module.exports = {
                 });
 
                 collector.on("collect", async (i) => {
-                    if(i.user.id !== interaction.user.id) return interaction.reply({content: "❌ This menu is not for you!", flags: MessageFlags.Ephemeral});
+                    if(i.user.id !== interaction.user.id) {
+                        errorEmbed.setDescription("This menu is not for you!");
+                        return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                    };
 
                     if(i.customId === "channel") {
                         const channel = i.channels.first();
@@ -300,7 +343,10 @@ module.exports = {
 
                 const status = getLog(interaction.guild.id, log);
 
-                if(!status.enabled) return interaction.reply({content: "❌ This type of logs is not enabled! Please use /manage logs enable to enable it.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("This type of logs is not enabled! Please use `/manage logs enable` to enable it!");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const embed = new EmbedBuilder()
                     .setTitle("Log Editing")
@@ -323,7 +369,10 @@ module.exports = {
 
 
                 collector.on("collect", async (i) => {
-                    if(i.user.id !== interaction.user.id) return interaction.reply({content: "❌ This menu is not for you!", flags: MessageFlags.Ephemeral});
+                    if(i.user.id !== interaction.user.id) {
+                        errorEmbed.setDescription("This menu is not for you!");
+                        return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                    };
 
                     if(i.customId === "channel") {
                         const channel = i.channels.first();
@@ -354,11 +403,15 @@ module.exports = {
 
                 const status = getLog(interaction.guild.id, log);
 
-                if(!status.enabled) return interaction.reply({content: "❌ This type of logs is not enabled, no need to use this command.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("This type of logs is not enabled, no need to use this command.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 disableLog(interaction.guild.id, log);
 
-                return interaction.reply({content: "✅ Log Type disabled."});
+                successEmbed.setDescription("Log type disabled.");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
@@ -385,10 +438,12 @@ module.exports = {
 
                 if(!status) {
                     ignoreUser(interaction.guild.id, user.id);
-                    return interaction.reply("✅ User ignored.");
+                    successEmbed.setDescription("User ignored.");
+                    return interaction.reply({embeds: [successEmbed]});
                 } else {
                     unignoreUser(interaction.guild.id, user.id);
-                    return interaction.reply("✅ User unignored.");
+                    successEmbed.setDescription("User unignored.");
+                    return interaction.reply({embeds: [successEmbed]});
                 };
             };
 
@@ -400,10 +455,12 @@ module.exports = {
 
                 if(!status) {
                     ignoreChannel(interaction.guild.id, channel.id);
-                    return interaction.reply("✅ Channel ignored.");
+                    successEmbed.setDescription("Channel ignored.");
+                    return interaction.reply({embeds: [successEmbed]});
                 } else {
                     unignoreChannel(interaction.guild.id, channel.id);
-                    return interaction.reply("✅ Channel unignored.");
+                    successEmbed.setDescription("Channel unignored.");
+                    return interaction.reply({embeds: [successEmbed]});
                 };
             };
 
@@ -435,34 +492,46 @@ module.exports = {
 
             if(sub === "enable") {
                 const status = getSuggest(interaction.guild.id);
-                if(status.enabled) return interaction.reply({content: "❌ Suggestions are already enabled.", flags: MessageFlags.Ephemeral});
+                if(status.enabled) {
+                    errorEmbed.setDescription("Suggestions are already enabled.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const channel = interaction.options.getChannel("channel", true);
 
                 enableSuggestions(interaction.guild.id, channel.id);
 
-                return interaction.reply({content: "✅ Suggestions enabled!"});
+                successEmbed.setDescription("Suggestions enabled!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
             if(sub === "edit") {
                 const status = getSuggest(interaction.guild.id);
-                if(!status.enabled) return interaction.reply({content: "❌ Suggestions are disabled.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("Suggestions are disabled.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 const channel = interaction.options.getChannel("channel", true);
 
                 editChannel(interaction.guild.id, channel.id);
 
-                return interaction.reply("✅ Suggestion channel edited!");
+                successEmbed.setDescription("Suggestion channel edited!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
 
             if(sub === "disable") {
                 const status = getSuggest(interaction.guild.id);
-                if(!status.enabled) return interaction.reply({content: "❌ Suggestions are already disabled.", flags: MessageFlags.Ephemeral});
+                if(!status.enabled) {
+                    errorEmbed.setDescription("Suggestions are already disabled.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
 
                 disableSuggestions(interaction.guild.id);
 
-                return interaction.reply("✅ Suggestions disabled.");
+                successEmbed.setDescription("Suggestions disabled!");
+                return interaction.reply({embeds: [successEmbed]});
             };
 
             if(sub === "get") {

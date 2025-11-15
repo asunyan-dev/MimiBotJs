@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ModalBuilder, ComponentType, TextInputStyle, InteractionContextType, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, ModalBuilder, ComponentType, TextInputStyle, InteractionContextType, MessageFlags, EmbedBuilder } = require('discord.js');
 
 const { getSuggest } = require('../modules/suggestions');
 
@@ -12,7 +12,15 @@ module.exports = {
         if(!interaction.guild) return;
         const status = getSuggest(interaction.guild.id);
 
-        if(!status.enabled) return interaction.reply({content: "❌ Suggestions are disabled.", flags: MessageFlags.Ephemeral});
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        if(!status.enabled) {
+            errorEmbed.setDescription("Suggestions are disabled.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
 
         const modal = new ModalBuilder()

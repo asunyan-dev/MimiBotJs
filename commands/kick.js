@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,7 +22,20 @@ module.exports = {
     async execute(interaction) {
         if(!interaction.guild) return;
 
-        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) return interaction.reply({content: "❌ I am missing permissions: `KICK_MEMBERS`.", flags: MessageFlags.Ephemeral});
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
+            errorEmbed.setDescription("I am missing permissions: `KICK_MEMBERS`.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
         const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
         if(!member) return;
@@ -33,25 +46,37 @@ module.exports = {
 
         const target = await interaction.guild.members.fetch(user.id).catch(() => null);
 
-        if(!target) return interaction.reply({content: "❌ Failed to find member.", flags: MessageFlags.Ephemeral});
+        if(!target) {
+            errorEmbed.setDescription("Member not found in the server.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
 
 
         if(target.roles.highest.position >= member.roles.highest.position) {
-            return interaction.reply({content: "❌ You can't kick someone with a higher role than you.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("You can't kick someone with a higher role than you.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
         if(target.roles.highest.position >= interaction.guild.members.me.roles.highest.position) {
-            return interaction.reply({content: "❌ I can't kick someone with a higher role than me.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("I can't kick someone with a higher role than me.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
 
         if(!target.kickable) {
-            return interaction.reply({content: "❌ This member is not kickable.", flags: MessageFlags.Ephemeral});
+            errorEmbed.setDescription("This member can't be kicked.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
 
-
-        await target.kick({reason: reason});
-
-        return interaction.reply({content: "✅ Member kicked."});
+        try {
+            await target.kick({reason: reason});
+            successEmbed.setDescription("Member kicked.")
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+        } catch (err) {
+            console.error(err);
+            errorEmbed.setDescription("Failed to kick member. Do I have the right permissions?");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+        
     }
 }
