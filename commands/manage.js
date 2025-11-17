@@ -12,6 +12,8 @@ const { ignoreChannel, unignoreChannel, ignoreUser, unignoreUser, getAllChannels
 
 const { enableSuggestions, editChannel, getSuggest, disableSuggestions } = require('../modules/suggestions');
 
+const modmail = require('../modules/modmail');
+
 
 
 module.exports = {
@@ -131,6 +133,27 @@ module.exports = {
             )
             .addSubcommand((sub) => 
                 sub.setName("get").setDescription("Get current config for suggestions.")
+            )
+        )
+        .addSubcommandGroup((group) => 
+            group.setName("modmail").setDescription("Manage modmail")
+            .addSubcommand((sub) => 
+                sub.setName("enable").setDescription("Enable modmail")
+                .addChannelOption((option) => 
+                    option.setName("channel").setDescription("Channel where modmail will be sent").setRequired(true)
+                )
+            )
+            .addSubcommand((sub) => 
+                sub.setName("edit-channel").setDescription("Edit channel for modmail")
+                .addChannelOption((option) => 
+                    option.setName("channel").setDescription("New channel").setRequired(true)
+                )
+            )
+            .addSubcommand((sub) => 
+                sub.setName("disable").setDescription("Disable modmail")
+            )
+            .addSubcommand((sub) => 
+                sub.setName("get").setDescription("Get your modmail config")
             )
         ),
 
@@ -546,6 +569,66 @@ module.exports = {
                 return interaction.reply({embeds: [embed]});
             }
         } // end of group suggestions 
+
+        if(group === "modmail") {
+            const status = modmail.getModmail(interaction.guild.id);
+
+
+            if(sub === "enable") {
+                if(status.enabled) {
+                    errorEmbed.setDescription("ModMail is already enabled.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
+
+                const channel = interaction.options.getChannel("channel", true);
+
+                modmail.enableModmail(interaction.guild.id, channel.id);
+
+                successEmbed.setDescription("ModMail enabled!");
+                return interaction.reply({embeds: [successEmbed]});
+            };
+
+
+            if(sub === "edit-channel") {
+                if(!status.enabled) {
+                    errorEmbed.setDescription("ModMail is not enabled. Please use `/manage modmail enable` to enable it.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
+
+                const channel = interaction.options.getChannel("channel", true);
+
+                modmail.editModmailChannel(interaction.guild.id, channel.id);
+
+                successEmbed.setDescription("ModMail Channel edited!");
+                return interaction.reply({embeds: [successEmbed]});
+            };
+
+
+            if(sub === "disable") {
+                if(!status.enabled) {
+                    errorEmbed.setDescription("ModMail is not enabled.");
+                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+                };
+
+                modmail.disableModmail(interaction.guild.id);
+
+                successEmbed.setDescription("ModMail disabled!");
+                return interaction.reply({embeds: [successEmbed]});
+            };
+
+
+            if(sub === "get") {
+                const embed = new EmbedBuilder()
+                    .setTitle(`ModMail config for ${interaction.guild.name}`)
+                    .setColor(0xe410d3)
+                    .setThumbnail(interaction.guild.iconURL({size: 512}))
+                    .setDescription(`**Enabled?** ${status.enabled ? "✅" : "❌"}\n\n**Channel:** ${status.channelId ? `<#${status.channelId}>` : "N/A"}`)
+                    .setTimestamp();
+
+
+                return interaction.reply({embeds: [embed]});
+            }
+        } // end of group modmail
 
         
     }
