@@ -7,6 +7,13 @@ const { enableWelcome, editWelcome, getWelcome } = require('./modules/welcoming'
 const { sendMessage } = require('./modules/sendMessage');
 const modmail = require('./modules/modmail');
 
+
+const dataFolder = path.join(__dirname, "data");
+if(!fs.existsSync(dataFolder)) {
+    fs.mkdirSync(dataFolder, {recursive: true});
+    console.log("📁 Created folder data.");
+};
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
