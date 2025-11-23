@@ -1,10 +1,18 @@
-const { Client, Collection, GatewayIntentBits, Partials, Events, ModalBuilder, ComponentType, TextInputStyle, ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, Events, ModalBuilder, ComponentType, TextInputStyle, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('./config.json');
 
 const { enableWelcome, editWelcome, getWelcome } = require('./modules/welcoming');
 const { sendMessage } = require('./modules/sendMessage');
+const modmail = require('./modules/modmail');
+
+
+const dataFolder = path.join(__dirname, "data");
+if(!fs.existsSync(dataFolder)) {
+    fs.mkdirSync(dataFolder, {recursive: true});
+    console.log("📁 Created folder data.");
+};
 
 const client = new Client({
     intents: [
@@ -54,6 +62,192 @@ for (const file of eventFiles) {
 };
 
 
+
+// modmail modals
+
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if(!interaction.isModalSubmit()) return;
+
+    let errorEmbed = new EmbedBuilder()
+        .setTitle("❌ Error")
+        .setColor("Red")
+        .setTimestamp();
+
+    let successEmbed = new EmbedBuilder()
+        .setTitle("✅ Success!")
+        .setColor("Green")
+        .setTimestamp();
+
+
+    if(interaction.customId === "modmail") {
+        const message = interaction.fields.getTextInputValue("message");
+        const status = modmail.getModmail(interaction.guild.id);
+
+        const channelId = status.channelId;
+
+        const embed = new EmbedBuilder()
+            .setTitle(`New message from ${interaction.user.username}`)
+            .setThumbnail(interaction.user.displayAvatarURL({size: 512}))
+            .setDescription(message)
+            .setColor(0xe410d3)
+            .setTimestamp();
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`modmail_reply_${interaction.user.id}`)
+                .setLabel("Reply")
+                .setStyle(ButtonStyle.Primary)
+        ).toJSON();
+
+        try {
+            await sendMessage(client, interaction.guild.id, channelId, {embeds: [embed], components: [row]});
+            successEmbed.setDescription("Message sent.")
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+        } catch (error) {
+            console.log(error);
+            errorEmbed.setDescription("Failed to send message. Please try again later.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+    };
+
+    if(interaction.customId.startsWith("modmail_reply_")) {
+        const userId = interaction.customId.replace("modmail_reply_", "");
+
+        const message = interaction.fields.getTextInputValue("message");
+
+        const embed = new EmbedBuilder()
+            .setTitle(`Reply from ${interaction.guild.name}'s Staff`)
+            .setColor(0xe410d3)
+            .setThumbnail(interaction.guild.iconURL({size: 512}))
+            .setDescription(message)
+            .setTimestamp();
+
+        const user = await interaction.guild.members.fetch(userId).catch(() => null);
+        if(!user) {
+            errorEmbed.setDescription("Member not found.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`user_reply_${interaction.guild.id}`)
+                .setLabel("Reply")
+                .setStyle(ButtonStyle.Primary)
+        ).toJSON();
+
+        try {
+            await user.send({embeds: [embed], components: [row]});
+            successEmbed.setDescription("Reply sent.")
+            return interaction.reply({embeds: [successEmbed]});
+        } catch (error) {
+            console.log(error);
+            errorEmbed.setDescription("Failed to send reply. User probably has DMs closed.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+    };
+
+    if(interaction.customId.startsWith("user_reply_")) {
+        const guildId = interaction.customId.replace("user_reply_", "");
+
+        const status = modmail.getModmail(guildId);
+
+        const message = interaction.fields.getTextInputValue("message");
+
+        const embed = new EmbedBuilder()
+            .setTitle(`New reply from ${interaction.user.username}`)
+            .setColor(0xe410d3)
+            .setDescription(message)
+            .setThumbnail(interaction.user.displayAvatarURL({size: 512}))
+            .setTimestamp();
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`modmail_reply_${interaction.user.id}`)
+                .setLabel("Reply")
+                .setStyle(ButtonStyle.Primary)
+        ).toJSON();
+
+        try {
+            await sendMessage(client, guildId, status.channelId, {embeds: [embed], components: [row]});
+            successEmbed.setDescription("Reply sent.")
+            return interaction.reply({embeds: [successEmbed]});
+        } catch (error) {
+            console.log(error);
+            errorEmbed.setDescription("Failed to send reply, please try again later.");
+            return interaction.reply({embeds: [errorEmbed]});
+        }
+    }
+});
+
+
+// modmail buttons
+
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if(!interaction.isButton()) return;
+
+    let errorEmbed = new EmbedBuilder()
+        .setTitle("❌ Error")
+        .setColor("Red")
+        .setTimestamp();
+
+    let successEmbed = new EmbedBuilder()
+        .setTitle("✅ Success!")
+        .setColor("Green")
+        .setTimestamp();
+
+    if(interaction.customId.startsWith("modmail_reply_")) {
+        const userId = interaction.customId.replace("modmail_reply_", "");
+        const user = await interaction.guild.members.fetch(userId).catch(() => null);
+        if(!user) {
+            errorEmbed.setDescription("Member not found.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        const modal = new ModalBuilder()
+            .setCustomId(`modmail_reply_${userId}`)
+            .setTitle("New reply")
+            .addLabelComponents(
+                {
+                    type: ComponentType.Label,
+                    label: "Your reply",
+                    component: {
+                        type: ComponentType.TextInput,
+                        custom_id: "message",
+                        style: TextInputStyle.Paragraph,
+                        placeholder: "Type your reply here...",
+                        required: true
+                    }
+                }
+            ).toJSON()
+
+        await interaction.showModal(modal);
+    };
+
+    if(interaction.customId.startsWith("user_reply_")) {
+        const guildId = interaction.customId.replace("user_reply_", "");
+
+        const modal = new ModalBuilder()
+            .setCustomId(`user_reply_${guildId}`)
+            .setTitle("New reply")
+            .addLabelComponents(
+                {
+                    type: ComponentType.Label,
+                    label: "Your reply",
+                    component: {
+                        type: ComponentType.TextInput,
+                        custom_id: "message",
+                        style: TextInputStyle.Paragraph,
+                        placeholder: "Type your reply here...",
+                        required: true
+                    }
+                }
+            ).toJSON();
+
+        await interaction.showModal(modal);
+    }
+})
 
 
 

@@ -31,16 +31,20 @@ module.exports = {
 
 
         if(oldMessage.content !== newMessage.content) {
-            const embed = new EmbedBuilder()
-                .setTitle("Message Edited")
-                .setThumbnail(newMessage.author.displayAvatarURL({size: 512}))
-                .setColor(0xe410d3)
-                .setDescription(`**Channel:** <#${newMessage.channel.id}>\n\n**Before:**\n${oldMessage.content.substring(0, 400)}\n\n**After:**\n${newMessage.content.substring(0, 400)}`)
-                .setFooter({text: `User ID: ${newMessage.author.id}`})
-                .setTimestamp();
-
             try {
-                await sendMessage(client, guildId, channelId, {embeds: [embed]});
+                const embed = new EmbedBuilder()
+                    .setTitle("Message Edited")
+                    .setThumbnail(newMessage.author.displayAvatarURL({size: 512}))
+                    .setColor(0xe410d3)
+                    .setDescription(`**Channel:** <#${newMessage.channel.id}>\n\n**Before:**\n${oldMessage.content.substring(0, 400)}\n\n**After:**\n${newMessage.content.substring(0, 400)}`)
+                    .setFooter({text: `User ID: ${newMessage.author.id}`})
+                    .setTimestamp();
+
+                try {
+                    await sendMessage(client, guildId, channelId, {embeds: [embed]});
+                } catch (err) {
+                    console.log(err);
+                }
             } catch (err) {
                 console.log(err);
             }
