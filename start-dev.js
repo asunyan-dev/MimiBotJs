@@ -55,6 +55,45 @@ for (const file of eventFiles) {
     };
 };
 
+// bug report modal
+
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if(!interaction.isModalSubmit()) return;
+
+    if(interaction.customId === "bug_report") {
+        const message = interaction.fields.getTextInputValue("message");
+
+        const embed = new EmbedBuilder()
+            .setTitle("New bug reported")
+            .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({size: 128})})
+            .setColor(0xe410d3)
+            .setDescription(message)
+            .setTimestamp();
+
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+
+        try {
+            await sendMessage(client, config.mimicord, config.reports_channel, {embeds: [embed]});
+            successEmbed.setDescription("Report sent!")
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+        } catch (error) {
+            console.log(error);
+            errorEmbed.setDescription("Error while sending report.");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+    }
+})
+
 
 
 // modmail modals
