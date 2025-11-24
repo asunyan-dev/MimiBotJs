@@ -55,7 +55,7 @@ for (const file of eventFiles) {
     };
 };
 
-// bug report modal
+// bug report modal + requests modal
 
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -91,6 +91,41 @@ client.on(Events.InteractionCreate, async (interaction) => {
             errorEmbed.setDescription("Error while sending report.");
             return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
         };
+    };
+
+
+    if(interaction.customId === "request") {
+        const name = interaction.fields.getTextInputValue("name");
+        const text = interaction.fields.getTextInputValue("text");
+
+        let errorEmbed = new EmbedBuilder()
+            .setTitle("❌ Error")
+            .setColor("Red")
+            .setTimestamp();
+
+        let successEmbed = new EmbedBuilder()
+            .setTitle("✅ Success!")
+            .setColor("Green")
+            .setTimestamp();
+
+        const embed = new EmbedBuilder()
+            .setTitle("New request")
+            .setColor(0xe410d3)
+            .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({size: 128})})
+            .setDescription(text)
+            .setFooter({text: `Name: ${name}`})
+            .setTimestamp();
+
+        try {
+            await sendMessage(client, config.mimicord, config.requests_channel, {embeds: [embed]});
+            successEmbed.setDescription("Request sent!\nIf you wish to follow its progress, you can join the support server:\nhttps://mimicord.com/");
+            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+        } catch (error) {
+            console.log(error);
+            errorEmbed.setDescription("There was an error sending your request. You might want to either report a bug by using `/report-a-bug` or by joining the [support server](https://mimicord.com/).");
+            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        }
+
     }
 })
 
