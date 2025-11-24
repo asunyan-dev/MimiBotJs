@@ -14,16 +14,25 @@ module.exports = {
             guild.members.fetch();
         });
 
+        const statuses = [
+            { type: ActivityType.Custom, name: "Status 1", state: "ℹ️ Latest update info: /changelog get" },
+            { type: ActivityType.Custom, name: "Status 2", state: "ℹ️ Info: /info" },
+            { type: ActivityType.Custom, name: "Status 3", state: `🌸 In ${client.guilds.cache.size.toString()}` },
+            { type: ActivityType.Custom, name: "Status 4", state: "🌸 Support server: mimicord.com" }
+        ];
 
-        client.user.setPresence({
-            activities: [
-                {
-                    type: ActivityType.Custom,
-                    name: "blblblb",
-                    state: "🐈 Meow"
-                }
-            ],
-            status: "online"
-        });
+
+        function setRandomStatus() {
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+
+            client.user.setPresence({
+                activities: [randomStatus],
+                status: "online"
+            });
+        };
+
+        setRandomStatus();
+
+        setInterval(setRandomStatus, 600_000);
     }
 }

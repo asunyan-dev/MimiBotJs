@@ -148,23 +148,6 @@ module.exports = {
                 successEmbed.setDescription("Suggestion sent!");
                 return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
             };
-
-
-            if(interaction.customId === "request") {
-                const name = interaction.fields.getTextInputValue("name");
-                const text = interaction.fields.getTextInputValue("text");
-
-                const owner = await client.users.fetch(config.owner_id).catch(() => null);
-
-                if(!owner) {
-                    errorEmbed.setDescription("There was an error please try again later.");
-                    return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-                };
-                await owner.send({content: `New request from ${name} (username: ${interaction.user.username}):\n\n${text}`});
-
-                successEmbed.setDescription("Request sent!");
-                return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
-            };
         }
     }
 }
