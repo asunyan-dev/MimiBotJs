@@ -23,8 +23,16 @@ function ensureGuild(data, guildId) {
             memberEvents: { enabled: false, channelId: null },
             messageLogs: { enabled: false, channelId: null },
             joinLeave: { enabled: false, channelId: null },
-            voiceLogs: { enabled: false, channelId: null }
+            voiceLogs: { enabled: false, channelId: null },
+            guildEvents: { enabled: false, channelId: null }
         };
+        save(data);
+    };
+};
+
+function ensureLog(data, guildId, log) {
+    if(!data[guildId][log]) {
+        data[guildId][log] = { enabled: false, channelId: null };
         save(data);
     };
 };
@@ -57,6 +65,7 @@ module.exports = {
     getLog(guildId, log) {
         const data = load();
         ensureGuild(data, guildId);
+        ensureLog(data, guildId, log);
         return data[guildId][log];
     },
 

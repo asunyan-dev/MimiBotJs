@@ -2,6 +2,10 @@ const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, Messag
 
 const { getWarningStatus, addWarn } = require('../modules/warning');
 
+const logs = require('../modules/logs');
+
+const { sendMessage } = require('../modules/sendMessage');
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -80,11 +84,31 @@ module.exports = {
         try {
             await target.send({embeds: [embed]});
             successEmbed.setDescription("Member warned.");
-            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+            interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         } catch (err) {
             console.error(err);
             successEmbed.setDescription("Member warned!\n⚠️ Failed to DM member. They have DMs closed.");
-            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+            interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+
+        const logStatus = logs.getLog(interaction.guild.id, "memberEvents");
+
+        if(!logStatus.enabled) return;
+
+        const logEmbed = new EmbedBuilder()
+            .setTitle("Member Warned")
+            .setDescription(`<@${user.id}>\n\nWarned by: <@${interaction.user.id}>\n\nReason: ${reason}`)
+            .setThumbnail(target.displayAvatarURL({size: 512}))
+            .setColor(0xe410d3)
+            .setFooter({text: `User ID: ${user.id}`})
+            .setTimestamp();
+
+        
+        try {
+            sendMessage(interaction.client, interaction.guild.id, logStatus.channelId, {embeds: [logEmbed]});
+        } catch (error) {
+            console.log(error);
         }
     }
 }

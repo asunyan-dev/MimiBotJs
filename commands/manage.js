@@ -64,7 +64,8 @@ module.exports = {
                         { name: "Member Events", value: "memberEvents" },
                         { name: "Message Logs", value: "messageLogs" },
                         { name: "Join/Leave", value: "joinLeave" },
-                        { name: "Voice Logs", value: "voiceLogs" }
+                        { name: "Voice Logs", value: "voiceLogs" },
+                        { name: "Server Events", value: "guildEvents" }
                     )
                 )
             )
@@ -76,7 +77,8 @@ module.exports = {
                         { name: "Member Events", value: "memberEvents" },
                         { name: "Message Logs", value: "messageLogs" },
                         { name: "Join/Leave", value: "joinLeave" },
-                        { name: "Voice Logs", value: "voiceLogs" }
+                        { name: "Voice Logs", value: "voiceLogs" },
+                        { name: "Server Events", value: "guildEvents" }
                     )
                 )
             )
@@ -88,7 +90,8 @@ module.exports = {
                         { name: "Member Events", value: "memberEvents" },
                         { name: "Message Logs", value: "messageLogs" },
                         { name: "Join/Leave", value: "joinLeave" },
-                        { name: "Voice Logs", value: "voiceLogs" }
+                        { name: "Voice Logs", value: "voiceLogs" },
+                        { name: "Server Events", value: "guildEvents" }
                     )
                 )
             )

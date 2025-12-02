@@ -1,5 +1,8 @@
 const { SlashCommandBuilder, InteractionContextType, PermissionFlagsBits, MessageFlags, EmbedBuilder } = require('discord.js');
 
+const logs = require('../modules/logs');
+const { sendMessage } = require('../modules/sendMessage');
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("kick")
@@ -71,11 +74,30 @@ module.exports = {
         try {
             await target.kick({reason: reason});
             successEmbed.setDescription("Member kicked.")
-            return interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
+            interaction.reply({embeds: [successEmbed], flags: MessageFlags.Ephemeral});
         } catch (err) {
             console.error(err);
             errorEmbed.setDescription("Failed to kick member. Do I have the right permissions?");
             return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
+        };
+
+        const status = logs.getLog(interaction.guild.id, "memberEvents");
+
+        if(!status.enabled) return;
+
+
+        const logEmbed = new EmbedBuilder()
+            .setTitle("Member kicked")
+            .setDescription(`<@${target.id}>\n\nKicked by: <@${member.id}>\n\nReason: ${reason}`)
+            .setThumbnail(target.displayAvatarURL({size: 512}))
+            .setColor(0xe410d3)
+            .setFooter({text: `User ID: ${target.id}`})
+            .setTimestamp();
+
+        try {
+            sendMessage(interaction.client, interaction.guild.id, status.channelId, {embeds: [logEmbed]});
+        } catch (error) {
+            console.log(error);
         };
         
     }

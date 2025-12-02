@@ -1,3 +1,12 @@
+process.on("unhandledRejection", (reason, promise) => {
+    console.log("Unhandled promise rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+    console.log("Uncaught exception:", error);
+});
+
+
 const { Client, Collection, GatewayIntentBits, Partials, Events, ModalBuilder, ComponentType, TextInputStyle, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
