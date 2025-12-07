@@ -1,49 +1,70 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags, InteractionContextType } = require('discord.js');
-
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlags,
+  InteractionContextType,
+} = require("discord.js");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("coffee")
-        .setDescription("Get a random coffee pic")
-        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
+  data: new SlashCommandBuilder()
+    .setName("coffee")
+    .setDescription("Get a random coffee pic")
+    .setContexts(
+      InteractionContextType.BotDM,
+      InteractionContextType.Guild,
+      InteractionContextType.PrivateChannel
+    ),
 
-    async execute(interaction) {
+  async execute(interaction) {
+    let errorEmbed = new EmbedBuilder()
+      .setTitle("❌ Error")
+      .setColor("Red")
+      .setTimestamp();
 
-        let errorEmbed = new EmbedBuilder()
-            .setTitle("❌ Error")
-            .setColor("Red")
-            .setTimestamp();
+    try {
+      const res = await fetch(
+        "https://coffee.alexflipnote.dev/random.json"
+      ).catch(() => null);
 
-        try {
+      if (!res || !res.ok) {
+        errorEmbed.setDescription(
+          "There was an error with the API, please try again later."
+        );
+        return interaction.reply({
+          embeds: [errorEmbed],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
 
-            const res = await fetch("https://coffee.alexflipnote.dev/random.json").catch(() => null);
+      const data = await res.json().catch(() => null);
 
-            if(!res || !res.ok) {
-                errorEmbed.setDescription("There was an error with the API, please try again later.");
-                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-            };
+      if (!data || !data.file) {
+        errorEmbed.setDescription(
+          "Failed to get image, please try again later."
+        );
+        return interaction.reply({
+          embeds: [errorEmbed],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
 
+      const embed = new EmbedBuilder()
+        .setTitle("It's coffee time!")
+        .setColor(0xe410d3)
+        .setImage(data.file)
+        .setFooter({ text: "Provided by AlexFlipNote API" })
+        .setTimestamp();
 
-            const data = await res.json().catch(() => null);
-
-            if(!data || !data.file) {
-                errorEmbed.setDescription("Failed to get image, please try again later.");
-                return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-            };
-
-            const embed = new EmbedBuilder()
-                .setTitle("It's coffee time!")
-                .setColor(0xe410d3)
-                .setImage(data.file)
-                .setFooter({text: "Provided by AlexFlipNote API"})
-                .setTimestamp();
-
-            return interaction.reply({embeds: [embed]});
-
-        } catch (err) {
-            console.error(err);
-            errorEmbed.setDescription("There was an error with the API, please try again later.");
-            return interaction.reply({embeds: [errorEmbed], flags: MessageFlags.Ephemeral});
-        };
+      return interaction.reply({ embeds: [embed] });
+    } catch (err) {
+      console.error(err);
+      errorEmbed.setDescription(
+        "There was an error with the API, please try again later."
+      );
+      return interaction.reply({
+        embeds: [errorEmbed],
+        flags: MessageFlags.Ephemeral,
+      });
     }
-}
+  },
+};

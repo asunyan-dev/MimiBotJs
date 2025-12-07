@@ -1,90 +1,89 @@
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder } = require("discord.js");
 
-const { getLog } = require('../modules/logs');
+const { getLog } = require("../modules/logs");
 
-const { sendMessage } = require('../modules/sendMessage');
+const { sendMessage } = require("../modules/sendMessage");
 
-const { getUser, getChannel } = require('../modules/logIgnore');
-
+const { getUser, getChannel } = require("../modules/logIgnore");
 
 module.exports = {
-    name: Events.VoiceStateUpdate,
+  name: Events.VoiceStateUpdate,
 
+  async execute(oldState, newState, client) {
+    const guildId = newState.guild.id;
 
-    async execute(oldState, newState, client) {
+    const status = getLog(guildId, "voiceLogs");
+    if (!status.enabled) return;
 
-        const guildId = newState.guild.id;
+    const channelId = status.channelId;
 
-        const status = getLog(guildId, "voiceLogs");
-        if(!status.enabled) return;
+    if (!newState.member) return;
 
-        const channelId = status.channelId;
+    const userStatus = getUser(guildId, newState.member.id);
+    if (userStatus) return;
 
-        if(!newState.member) return;
+    if (!oldState.channel && newState.channel) {
+      const channelStatus = getChannel(guildId, newState.channel.id);
+      if (channelStatus) return;
 
+      const embed = new EmbedBuilder()
+        .setTitle("Voice joined")
+        .setDescription(
+          `<@${newState.member.id}> joined voice channel <#${newState.channel.id}>`
+        )
+        .setColor(0xe410d3)
+        .setFooter({ text: `User ID: ${newState.member.id}` })
+        .setTimestamp();
 
-        const userStatus = getUser(guildId, newState.member.id);
-        if(userStatus) return;
-
-        if(!oldState.channel && newState.channel) {
-            const channelStatus = getChannel(guildId, newState.channel.id);
-            if(channelStatus) return;
-
-            const embed = new EmbedBuilder()
-                .setTitle("Voice joined")
-                .setDescription(`<@${newState.member.id}> joined voice channel <#${newState.channel.id}>`)
-                .setColor(0xe410d3)
-                .setFooter({text: `User ID: ${newState.member.id}`})
-                .setTimestamp();
-
-            try {
-                await sendMessage(client, guildId, channelId, {embeds: [embed]});
-            } catch (err) {
-                console.log(err);
-            };
-        };
-
-
-        if(oldState.channel && !newState.channel) {
-            const channelStatus = getChannel(oldState.channel.id);
-            if(channelStatus) return;
-
-            const embed = new EmbedBuilder()
-                .setTitle("Voice left")
-                .setDescription(`<@${newState.member.id}> left voice channel <#${oldState.channel.id}>`)
-                .setColor(0xe410d3)
-                .setFooter({text: `User ID: ${newState.member.id}`})
-                .setTimestamp();
-
-            try {
-                await sendMessage(client, guildId, channelId, {embeds: [embed]});
-            } catch (err) {
-                console.log(err);
-            };
-        };
-
-
-        if(oldState.channel && newState.channel) {
-            const oldStatus = getChannel(guildId, oldState.channel.id);
-            const newStatus = getChannel(guildId, newState.channel.id);
-
-            if(oldStatus || newStatus) return;
-
-            if(oldState.channel !== newState.channel) {
-
-                const embed = new EmbedBuilder()
-                    .setTitle("Moved voice")
-                    .setDescription(`<@${newState.member.id}> moved from voice channel <#${oldState.channel.id}> to voice channel <#${newState.channel.id}>`)
-                    .setColor(0xe410d3)
-                    .setFooter({text: `User ID: ${newState.member.id}`})
-                    .setTimestamp();
-
-                try {
-                    await sendMessage(client, guildId, channelId, {embeds: [embed]});
-                } catch (err) {
-                    console.log(err);
-                }
-            }
-        }
+      try {
+        await sendMessage(client, guildId, channelId, { embeds: [embed] });
+      } catch (err) {
+        console.log(err);
+      }
     }
-}
+
+    if (oldState.channel && !newState.channel) {
+      const channelStatus = getChannel(oldState.channel.id);
+      if (channelStatus) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("Voice left")
+        .setDescription(
+          `<@${newState.member.id}> left voice channel <#${oldState.channel.id}>`
+        )
+        .setColor(0xe410d3)
+        .setFooter({ text: `User ID: ${newState.member.id}` })
+        .setTimestamp();
+
+      try {
+        await sendMessage(client, guildId, channelId, { embeds: [embed] });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (oldState.channel && newState.channel) {
+      const oldStatus = getChannel(guildId, oldState.channel.id);
+      const newStatus = getChannel(guildId, newState.channel.id);
+
+      if (oldStatus || newStatus) return;
+
+      if (oldState.channel !== newState.channel) {
+        const embed = new EmbedBuilder()
+          .setTitle("Moved voice")
+          .setDescription(
+            `<@${newState.member.id}> moved from voice channel <#${oldState.channel.id}> to voice channel <#${newState.channel.id}>`
+          )
+          .setColor(0xe410d3)
+          .setFooter({ text: `User ID: ${newState.member.id}` })
+          .setTimestamp();
+
+        try {
+          await sendMessage(client, guildId, channelId, { embeds: [embed] });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+  },
+};
